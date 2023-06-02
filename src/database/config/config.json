@@ -1,0 +1,30 @@
+{
+    "development": {
+      "username": "your_dev_db_username",
+      "password": "your_dev_db_password",
+      "database": "your_dev_db_name",
+      "host": "your_dev_db_host",
+      "dialect": "postgres"
+    },
+    "test": {
+      "username": "your_test_db_username",
+      "password": "your_test_db_password",
+      "database": "your_test_db_name",
+      "host": "your_test_db_host",
+      "dialect": "postgres"
+    },
+    "production": {
+      "username": "your_prod_db_username",
+      "password": "your_prod_db_password",
+      "database": "your_prod_db_name",
+      "host": "your_prod_db_host",
+      "dialect": "postgres",
+      "dialectOptions": {
+        "ssl": {
+          "require": true,
+          "rejectUnauthorized": false
+        }
+      }
+    }
+  }
+  

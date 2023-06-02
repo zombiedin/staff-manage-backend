@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Staff {
+  s_id     String  @id @unique @default(uuid())
+  t_id     String
+  r_id     String
+  dc_id    String  @unique
+  fname    String
+  lname    String
+  nickname String?
+  s_email  String  @unique
+}
+
+model Project {
+  p_id           String    @id @unique @default(uuid())
+  p_name         String
+  p_desc         String?
+  start_date     DateTime?
+  end_date       DateTime?
+  solution       String?
+  bu             String?
+  create_date    DateTime?
+  url            String
+  space          String
+  cu_id          String
+  priority       String?
+  first_retrieve DateTime
+  last_retrieve  DateTime
+}
+
+model Work_on {
+  w_id   String    @id @unique @default(uuid())
+  s_id   String
+  p_id   String
+  start  DateTime?
+  end    DateTime?
+  type   String?
+  status String?
+}
+
+model Staff_skill {
+  ssk_id String @id @unique @default(uuid())
+  sk_id  String
+  s_id   String
+}
+
+model Skill {
+  sk_id   String @id @unique @default(uuid())
+  sk_desc String @unique
+}
+
+model Assign {
+  a_id    String @id @unique @default(uuid())
+  a_email String
+  p_id    String
+  type    String
+}
+
+model Role {
+  r_id   String @id @unique @default(uuid())
+  r_desc String @unique
+}
+
+model Team {
+  t_id   String @id @unique @default(uuid())
+  t_desc String @unique
+}
+
+model User {
+  u_id    String @id @unique @default(uuid())
+  t_id    String
+  u_email String
+  auth_id String
+}
+
+model Authen {
+  auth_id         String  @id @unique @default(uuid())
+  role            String
+  see_all_members Boolean
+  editor          Boolean
+}
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// model Staff {
+//   s_id     String  @id @unique @default(uuid())
+//   t_id     String
+//   r_id     String
+//   dc_id    String  @unique
+//   fname    String
+//   lname    String
+//   nickname String?
+//   s_email  String  @unique
+//   //
+//   staff_skills  Staff_skill[]
+//   works Work_on[]
+//   role Role @relation(fields: [r_id], references: [r_id])
+//   team Team @relation(fields: [t_id], references: [t_id])
+// }
+
+// model Project {
+//   p_id           String    @id @unique @default(uuid())
+//   p_name         String
+//   p_desc         String?
+//   start_date     DateTime?
+//   end_date       DateTime?
+//   solution       String?
+//   bu             String?
+//   create_date    DateTime?
+//   url            String
+//   space          String
+//   cu_id          String
+//   priority       String?
+//   first_retrieve DateTime
+//   last_retrieve  DateTime
+//   //
+//   works Work_on[]
+//   assigns Assign[]
+// }
+
+// model Work_on {
+//   w_id   String    @id @unique @default(uuid())
+//   s_id   String
+//   p_id   String
+//   start  DateTime?
+//   end    DateTime?
+//   type   String?
+//   status String?
+//   //
+//   staff Staff @relation(fields: [s_id], references: [s_id])
+//   project Project @relation(fields: [p_id], references: [p_id])
+// }
+
+// model Staff_skill {
+//   ssk_id String @id @unique @default(uuid())
+//   sk_id  String
+//   s_id   String
+//   //
+//   staff Staff @relation(fields: [s_id], references: [s_id])
+//   skill Skill @relation(fields: [sk_id], references: [sk_id])
+// }
+
+// model Skill {
+//   sk_id   String @id @unique @default(uuid())
+//   sk_desc String @unique
+//   //
+//   staff_skills Staff_skill[]
+// }
+
+// model Assign {
+//   a_id    String @id @unique @default(uuid())
+//   a_email String
+//   p_id    String
+//   type    String
+//   //
+//   project Project @relation(fields: [p_id], references: [p_id])
+// }
+
+// model Role {
+//   r_id   String @id @unique @default(uuid())
+//   r_desc String @unique
+//   //
+//   staffs Staff[]
+// }
+
+// model Team {
+//   t_id   String @id @unique @default(uuid())
+//   t_desc String @unique
+//   //
+//   staffs Staff[]
+//   users User[]
+// }
+
+// model User {
+//   u_id    String @id @unique @default(uuid())
+//   t_id    String
+//   u_email String
+//   auth_id String
+//   //
+//   team Team @relation(fields: [t_id], references: [t_id])
+//   authen Authen @relation(fields: [auth_id], references: [auth_id])
+// }
+
+// model Authen {
+//   auth_id         String  @id @unique @default(uuid())
+//   role            String
+//   see_all_members Boolean
+//   editor          Boolean
+//   //
+//   users User[]
+// }

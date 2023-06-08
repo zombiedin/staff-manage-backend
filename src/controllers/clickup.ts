@@ -24,21 +24,21 @@ export async function retrieve(_req: Request, res: Response) {
         headers: {
           Authorization: process.env.CU_TOKEN,
         },
+        params: {
+          include_closed: true,
+        },
       }
     );
     const responseData = response.data;
-    const restructed = restructure(responseData);
-    // const result = store(restructed);
-    // if (result=="updated") {
-    //   res.json({ status: "updated" })
-    // } else {
-    //   res.json({ status: "no change"})
-    // }
-
+    const restructed = await restructure(responseData);
     res.json(restructed);
   } catch (error) {
     // Handle any errors that occur during the API call
     console.error('Error calling the other API:', error);
-    res.status(500).json({ error: 'An error occurred' });
+    res.status(500).json({ error: 'An error occurredxxx' });
   }
+}
+
+export function test(_req: Request, res: Response) {
+  res.json("OK");
 }

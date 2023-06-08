@@ -5,8 +5,8 @@ import {
   custom_fields,
   unix_fields,
 } from './clickup-variables';
-import isEqual from 'lodash/isEqual';
 import { PrismaClient } from '@prisma/client';
+import { NotNull } from 'sequelize-typescript';
 const prisma = new PrismaClient();
 /**
  *
@@ -15,6 +15,8 @@ const prisma = new PrismaClient();
 export async function restructure(data: any) {
   const projects = []; // list of projects
   const tasks = data.tasks; // all tasks from GT&D (array)
+  var update = 0;
+  var create = 0;
 
   for (let i = 0; i < tasks.length; i++) {
     // for every task in array
@@ -31,7 +33,7 @@ export async function restructure(data: any) {
         if (val instanceof Array) {
           var arr = [];
           for (let m = 0; m < val.length; m++) {
-            arr.push(val[m].email);
+            arr.push(val[m].username);
           }
           project[dictKey] = arr;
         } else {
@@ -125,83 +127,245 @@ export async function restructure(data: any) {
           } else {
             project[key] = null;
           }
+        } else if (type == 'url') {
+          if (transformed_custom[custom].hasOwnProperty('value')) {
+            project[key] = transformed_custom[custom].value;
+          } else {
+            project[key] = null;
+          }
         }
       }
     }
+
     for (const unix of unix_fields) {
       if (!isNull(project[unix])) {
         project[unix] = new Date(Number(project[unix]));
       }
     }
-
+    /////////////////////
+    // store or update //
+    /////////////////////
     const existingProject = await prisma.project.findUnique({
-      where: { cu_id: project.cu_id },
+      where: { cu_id: project["cu_id"] },
     });
-
     if (existingProject) {
       //update
-      const updateProject = await prisma.project.update({
-        where: { cu_id: project.cu_id },
-        data: {
-          p_name: project.p_name,
-          p_desc: project.p_desc,
-          start_date: project.start_date,
-          end_date: project.end_date,
-          solution: project.solution,
-          bu: project.bu,
-          priority: project.priority,
-          last_retrieve: new Date(),
-        },
-      });
+      //get status
+      const stat = await prisma.status.findFirst({
+        where: { desc: project.status_name }
+      })
+      //get solution
+      if (project.solution != null) {
+        const sol = await prisma.solution.findFirst({
+          where: { desc: project.solution }
+        })
+        const updateProject = await prisma.project.update({
+          where: { cu_id: project.cu_id },
+          data: {
+            p_name: project.p_name,
+            p_desc: project.p_desc,
+            start_date: project.start_date,
+            end_date: project.end_date,
+            solution: {
+              connect: { sol_id: sol?.sol_id }
+            },
+            status: {
+              connect: { status_id: stat!.status_id }
+            },
+            bu: project.bu,
+            priority: project.priority,
+            last_retrieve: new Date(),
+          },
+        });
+      } else {
+        const createProject = await prisma.project.update({
+          where: { cu_id: project.cu_id },
+          data: {
+            p_name: project.p_name,
+            p_desc: project.p_desc,
+            start_date: project.start_date,
+            end_date: project.end_date,
+            status: {
+              connect: { status_id: stat!.status_id }
+            },
+            bu: project.bu,
+            priority: project.priority,
+            last_retrieve: new Date(),
+          },
+        });
+      }
+      update++;
+
+      if (project.teams != null) {
+        const this_project = await prisma.project.findFirst({
+          where: { cu_id: project.cu_id }
+        });
+        for (const team of project.teams) {
+          const this_team = await prisma.team.findFirst({
+            where: { t_desc: team }
+          });
+          const existingPart = await prisma.participate.findFirst({
+            where: {
+              p_id: this_project!.p_id,
+              t_id: this_team!.t_id
+            },
+          });
+          if (existingPart == null) {
+            const participate = await prisma.participate.create({
+              data: {
+                project: {
+                  connect: {
+                    p_id: this_project!.p_id,
+                  }
+                },
+                team: {
+                  connect: {
+                    t_id: this_team!.t_id
+                  }
+                }
+              },
+            });
+          }
+        }
+      }
+      if (project.assignees.length > 0) {
+        const this_project = await prisma.project.findFirst({
+          where: { cu_id: project.cu_id }
+        });
+        for (const person of project.assignees) {
+          if (person == null) { continue; }
+          const existingAssign = await prisma.assign.findFirst({
+            where: {
+              a_name: person,
+              p_id: this_project!.p_id
+            },
+          });
+          if (existingAssign == null) {
+            const assign = await prisma.assign.create({
+              data: {
+                a_name: person,
+                project: {
+                  connect: {
+                    p_id: this_project!.p_id
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
     } else {
-      //create project
-      const createProject = await prisma.project.create({
-        data: {
-          p_name: project.p_name,
-          p_desc: project.p_desc,
-          start_date: project.start_date,
-          end_date: project.end_date,
-          solution: project.solution,
-          bu: project.bu,
-          create_date: project.create_date,
-          url: project.url,
-          space: project.space,
-          cu_id: project.cu_id,
-          priority: project.priority,
-          first_retrieve: new Date(),
-          last_retrieve: new Date(),
-        },
-      });
+      //get status
+      const stat = await prisma.status.findFirst({
+        where: { desc: project.status_name }
+      })
+      //get solution
+      if (project.solution != null) {
+        const sol = await prisma.solution.findFirst({
+          where: { desc: project.solution }
+        })
+        const createProject = await prisma.project.create({
+          data: {
+            p_name: project.p_name,
+            p_desc: project.p_desc,
+            start_date: project.start_date,
+            end_date: project.end_date,
+            solution: {
+              connect: { sol_id: sol!.sol_id }
+            },
+            status: {
+              connect: { status_id: stat!.status_id }
+            },
+            bu: project.bu,
+            create_date: project.create_date,
+            ticket_url: project.ticket_url,
+            space_url: project.space_url,
+            cu_id: project.cu_id,
+            priority: project.priority,
+            first_retrieve: new Date(),
+            last_retrieve: new Date(),
+          },
+        });
+      } else {
+        const createProject = await prisma.project.create({
+          data: {
+            p_name: project.p_name,
+            p_desc: project.p_desc,
+            start_date: project.start_date,
+            end_date: project.end_date,
+            status: {
+              connect: { status_id: stat!.status_id }
+            },
+            bu: project.bu,
+            create_date: project.create_date,
+            ticket_url: project.ticket_url,
+            space_url: project.space_url,
+            cu_id: project.cu_id,
+            priority: project.priority,
+            first_retrieve: new Date(),
+            last_retrieve: new Date(),
+          },
+        });
+      }
+      create++;
+      ////////////////////////////////////////////////////////////////////////////////
+
+      //////////////////////
+      //  assign to team  //
+      //////////////////////
+
+      if (project.teams != null) {
+        const this_project = await prisma.project.findFirst({
+          where: { cu_id: project.cu_id }
+        });
+        for (const team of project.teams) {
+          const this_team = await prisma.team.findFirst({
+            where: { t_desc: team }
+          });
+          const participate = await prisma.participate.create({
+            data: {
+              project: {
+                connect: {
+                  p_id: this_project!.p_id,
+                }
+              },
+              team: {
+                connect: {
+                  t_id: this_team!.t_id
+                }
+              }
+            },
+          });
+        }////////////////////////////////////////////////////////////////
+        if (project.assignees.length > 0) {
+          const this_project = await prisma.project.findFirst({
+            where: { cu_id: project.cu_id }
+          });
+          for (const person of project.assignees) {
+            if (person == null) { continue; }
+            const assign = await prisma.assign.create({
+              data: {
+                a_name: person,
+                project: {
+                  connect: {
+                    p_id: this_project!.p_id
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
     }
+
 
     projects.push(project);
   }
+
   const result: { [key: string]: Array<any> } = {
     projects: projects,
   };
 
-  // function findChanges(obj1: any, obj2: any, path: string = '') {
-  //   const eq = isEqual(obj1, obj2);
-  //   if (eq) { return; }
-  //   if (typeof obj1 !== 'object' || typeof obj2 !== 'object') {
-  //     console.log(`Change at path: ${path}`);
-  //     console.log('Old value:', obj1);
-  //     console.log('New value:', obj2);
-  //   } else {
-  //     for (const key in obj1) {
-  //       if (Object.prototype.hasOwnProperty.call(obj1, key)) {
-  //         const nestedPath = path ? `${path}.${key}` : key;
-  //         findChanges(obj1[key], obj2[key], nestedPath);
-  //       }
-  //     }
-  //   }
-  // }
-
+  console.log({ created: create, updated: update });
   return result;
 }
-
-/**
- *
- * @param data
- */
-export function storeFromClickup(data: any) {}

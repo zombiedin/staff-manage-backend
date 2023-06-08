@@ -7,8 +7,8 @@ export const attr_mapping: { [key: string]: string } = {
   due_date: 'end_date',
   assignees: 'assignees',
   date_created: 'created_date',
-  url: 'url',
   id: 'cu_id',
+  url: 'ticket_url',
 };
 
 // For mapping clickup attr to our own attr (but we want a value inside object)
@@ -33,6 +33,7 @@ export const custom_fields: { [key: string]: string } = {
   'Resource Data and Analytics': 'res_data',
   'Resource PMO&BA': 'res_pmo',
   'Assign to team': 'teams',
+  Space: 'space_url',
 };
 
 // for mapping unix

@@ -21,7 +21,7 @@ const axios = require('axios');
  */
 export async function retrieve(_req: Request, res: Response) {
   try {
-    const response = await axios.get(process.env.HRD_URL, {
+    const response = await axios.get(process.env.HRD_URL_ALL, {
       headers: {
         XApiKey: process.env.HRD_XAPI,
         APIKey: process.env.HRD_API,

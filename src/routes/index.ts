@@ -7,6 +7,7 @@
 import { Express } from 'express';
 import clickupRoute from '../routes/clickup';
 import hrdRoute from '../routes/hrd';
+import projectRoute from '../routes/project';
 /**
  *
  * @param {Express} app - The Express app instance to configure.
@@ -14,4 +15,5 @@ import hrdRoute from '../routes/hrd';
 export function setupRoutes(app: Express) {
   app.use('/api/cu', clickupRoute);
   app.use('/api/dc', hrdRoute);
+  app.use('/api/db', projectRoute);
 }

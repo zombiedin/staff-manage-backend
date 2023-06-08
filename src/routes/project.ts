@@ -3,14 +3,16 @@
 // eslint-disable-next-line node/no-unsupported-features/es-syntax
 import express from 'express';
 // eslint-disable-next-line node/no-unsupported-features/es-syntax
-import { retrieve, test } from '../controllers/clickup';
+import { deleteProject, deleteTSS, getProjects, mockupPart, mockupTSS } from '../controllers/project';
 
 const router = express.Router();
 
-router.get('/retrieve', retrieve);
-router.get('/test', test);
-// router.get('/create', create)
-router.get('/project/:id');
+router.get('/project', getProjects);
+router.post('/mockuptss', mockupTSS);
+router.delete('/mockuptss', deleteTSS);
+// router.post('/mockupproject', mockupProject);
+router.post('/mockuppart', mockupPart);
+router.delete('/allproject', deleteProject);
 
 // eslint-disable-next-line node/no-unsupported-features/es-syntax
 export default router;

@@ -17,17 +17,22 @@ This project is a backend application built using Node.js and Express.js. It pro
 
 ## Installation
 
-1. Clone the repository: `git clone https://github.com/zombiedin/staff-manage-backend.git` or <…azure devops link...>
+1. Clone the repository: `git clone https://betagro-dev@dev.azure.com/betagro-dev/D2023-001-Staffing_Management/_git/BackEnd`
 2. Install dependencies: `npm install`
 3. Set up the environment variables:
    - Copy the `.env.example` file to `.env` and update the values with your configuration.
-4. Run the project: `npm run dev`
+4. In case your database is not exist.
+   - Create a new database and put database url in `.env` first.
+5. Then use `npx prisma generate` to get `PrismaClient` ready to use.
+6. Follow by `npx prisma migrate dev` to migrate database to the latest version.
+7. Run the project: `npm run dev`
+8. Before retrieving any projects you need to define `Teams, Solutions, Statuses` first. by calling this endpoint `/api/db/mockuptss` .
 
 ## Usage
 
 1. Make sure the backend server is running.
 2. Use a tool like Postman to interact with the API endpoints.
-3. Refer to the [API Documentation](https://www.google.com/) for detailed instructions and examples. (not ready)
+3. Refer to the [API Documentation](https://www.google.com/) for detailed instructions and examples. `(not ready)`
 
 ## Configuration
 
@@ -45,13 +50,17 @@ The following environment variables need to be configured in the `.env` file:
 The API exposes the following endpoints: ( `[x]` = ready to use )
 
 - data integration API ( get data from external ):
-  - `[ ] GET /api/cu/retrieve`: Get all projects from ClickUp and update the database.
-  - `[ ] POST /api/dc/getall`: Get all staff details from HR datacenter.
+  - `[x] GET /api/cu/retrieve`: Get all projects from ClickUp and update the database.
+  - `[ ] GET /api/dc/getall`: Get all staff details from HR datacenter.
   - `[ ] GET /api/dc/datachange`: Get all changes that happen on HR datacenter.
+  - `[ ] ADFS system`: not available on this version.
 - data access API ( get data from our database ):
-  - `[ ] GET /api/project`: Get all projects within their team ( in body { } )
+  - `[x] GET /api/db/project`: Get all projects details.
+  - `[x] POST /api/db/mockuptss`: Create mockup teams, solutions, statuses.
+  - `[x] DELETE /api/db/mockuptss`: Delete mockup teams, solutions, statuses.
+  - `[x] DELETE /api/db/allproject`: Delete all projects.
 
-[not yet started] For detailed documentation and examples of API requests and responses, please refer to [API.md](https://www.google.com/).
+`[not ready]` For detailed documentation and examples of API requests and responses, please refer to [API.md](https://www.google.com/).
 
 ## Deployment
 

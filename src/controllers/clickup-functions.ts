@@ -277,7 +277,7 @@ export async function restructure(data: any) {
               connect: { status_id: stat!.status_id }
             },
             bu: project.bu,
-            create_date: project.create_date,
+            create_date: project.created_date,
             ticket_url: project.ticket_url,
             space_url: project.space_url,
             cu_id: project.cu_id,
@@ -297,7 +297,7 @@ export async function restructure(data: any) {
               connect: { status_id: stat!.status_id }
             },
             bu: project.bu,
-            create_date: project.create_date,
+            create_date: project.created_date,
             ticket_url: project.ticket_url,
             space_url: project.space_url,
             cu_id: project.cu_id,
